@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="author" content="Gordon Mei" />	
+	<title>Reticulating Splines - Studio Gordon Mei - Labs</title>
+	<meta name="viewport" content="width=device-width, initial-scale=0.5, minimum-scale:0.25, maximum-scale:1.6, user-scalable=yes;" />
+	<style type="text/css">
+		* {margin:0; padding:0; font:normal 14pt "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue","Helvetica","Arial",sans-serif; font-weight:300;}	
+		body {margin:2em 0;}
+		a:link, a:visited, a:focus, a:active {color:#009aff;}
+		a:hover {color:#ff5c80; text-decoration:line-through;}
+	
+		#thecontainerstore, #loadbarcontainer, #status {width:600px;}
+		
+		#thecontainerstore {margin:0 auto;}
+		
+        #loadbarcontainer {position:relative; border:1px solid #555; background-color:#eee; -webkit-border-radius:1.4em; -moz-border-radius:1.4em; border-radius:1.4em; overflow:hidden;}
+        
+        #loadbarprogress {margin:1px; width:0; height:40px; background-color:#2f2f2f; border:1px solid #171717; -webkit-border-radius:1.3em; -moz-border-radius:1.3em; border-radius:1.3em; background:-moz-linear-gradient(center top , #454545, #2f2f2f, #464646) repeat scroll 0 0 #2f2f2f; background:-webkit-gradient(linear, left top, left bottom, from(#454545), to(#464646), color-stop(0.5, #2f2f2f));}
+        
+        #status {text-align:center; font-size:18pt; color:#000; -webkit-animation-name:glow; -webkit-animation-duration:1s; -webkit-animation-iteration-count:infinite; -webkit-animation-direction:alternate;}
+
+		@-webkit-keyframes glow {0% {color:#000;} 100% {color:#09a;}}
+
+		input[type="submit"], #loadit {margin:0; padding:0.3em 0.7em; border:1px solid #cfd6d9; border-radius:20px; -moz-border-radius:20px; -webkit-border-radius:20px; background-color:#fff; background:-webkit-gradient(linear, left top, left bottom, from(#fff), to(#e3e7ef)); background:-moz-linear-gradient(top, #fff, #fff, #e3e7ef); text-shadow: #fff 0 1px 0;}
+		
+		input[type="submit"]:hover, #loadit:hover {cursor:pointer; background-color:#eee; background:-webkit-gradient(linear, left top, left bottom, from(#fff), to(#fff), color-stop(0.5, #e3e7ef)) !important; background:-moz-linear-gradient(top, #fff, #e3e7ef, #fff) !important;}
+		
+		#loadit {margin-top:2em;}
+        
+		#sosumi {margin:1em 0;}
+		#sosumi, #sosumi a, #sosumi p, #sosumi p a {font-size:10pt;}
+		#sosumi p, #sosumi p a {color:#999; font-style:italic;}
+		
+		@media only screen and (max-device-width:480px) {#loadit{font-size:200% !important}}
+    </style>
+    <link rel="shortcut icon" href="../../favico.png" type="image/png" />
+</head>
+    <body>
+    	
+    	<div id="thecontainerstore">
+    	
+	        <div id="loadbarcontainer">
+	            <div id="loadbarprogress" style="visibility:hidden;">
+	            </div>
+	        </div>
+
+	        <div id="status">
+	        	Reticulating splines...
+	        </div>
+		
+	        <input type="submit" id="loadit" value="Start!" />
+
+			<div id="sosumi">2010. <a href="http://www.monstercyb.org/gordon/lab">Monstercyb.org</a>. A part of the <a href="http://www.ocf.berkeley.edu/~gordeon">GordeonBleu</a> network.<p>Special thanks to <a href="http://potch.me">Matt Claypotch</a>.</p></div>
+
+		</div>
+
+		<script type="text/javascript">
+			/* Progress bar core functionality courtesy of Matt Claypotch at potch.me */
+			/* Sims-style message logic by yours truly, Gordon Mei */
+	
+			var iterator;
+			//duration is length of animation in seconds
+			//segments is number of "steps" in the bar
+			//loadbarprogress is in percentage units and <1
+	
+			function loadBar(duration, segments) {
+				//prevent vertical border-left from appearing in border radius
+				var loadbarprogressElement = document.getElementById("loadbarprogress");
+				loadbarprogressElement.style.visibility = "visible";
+	
+				clearInterval(iterator);
+				var loadbarprogress = 0;
+				var messages = [
+					"Inspecting rain gutters...",
+					"Peeling onions...",
+					"Watching Oprah...",
+					"Finishing touches..."
+				];
+				var numberOfMessages = 4;
+				var messagesIndex = 0;
+	
+				//percentage for 1st message-switch threshold = (total segments / number of messages) / total segments
+				var thresholdUnit = (segments / numberOfMessages) / segments;
+	
+			    //define first unit
+				var thresholdPosition = thresholdUnit;
+	
+				function doIterate() {
+					if (loadbarprogress >= 1) {
+						loadbarprogress = 1;
+						clearInterval(iterator);
+					}
+					//12 is the initial width, needs to be twice the inner border radius
+					//584 = outer container width - initial width - 2
+					loadbarprogressElement.style.width = (loadbarprogress * (584) + 12) + "px";
+	
+					loadbarprogress += 1 / segments;
+	
+					//compare current threshold position % with current "loadbarprogress" %
+					//if it passes, x += 1 unit of x to move threshold forward to the next one	
+					if (loadbarprogress >= thresholdPosition) {
+						document.getElementById("status").innerHTML = messages[messagesIndex];
+						messagesIndex++;
+						thresholdPosition += thresholdUnit;
+					}
+					
+				}
+				iterator = setInterval(doIterate, duration * 1000 / segments);
+				//returning the iterator, so it's easy to clear yourself
+				return iterator;
+			}
+	
+			var buttonloadit = document.getElementById("loadit");
+			if (buttonloadit.addEventListener) {
+				buttonloadit.addEventListener("click", function(){loadBar(5,150);}, false);
+			}
+			else if (buttonloadit.attachEvent) {
+				buttonloadit.attachEvent("onclick", function(){loadBar(5,150);});
+			}
+	
+		</script>
+		
+		<!--2010 March 5 and 10-->
+		
+		<script type="text/javascript">
+		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+		try {
+		var pageTracker = _gat._getTracker("UA-299058-9");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>	
+    </body>
+</html>
